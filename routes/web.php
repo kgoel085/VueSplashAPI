@@ -15,6 +15,11 @@
 //     return $router->app->version();
 // });
 
+//Beow route will register the user in the system
+$router->post('/register', [
+    'as' => 'register', 'uses' => 'UserController@register'
+]);
+
 //Below route will be used to generate a JWT token
 $router->post('/generateToken', [
     'as' => 'generate.token', 'uses' => 'JWTController@generateToken'
