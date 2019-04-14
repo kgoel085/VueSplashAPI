@@ -15,18 +15,29 @@
 //     return $router->app->version();
 // });
 
-//Beow route will register the user in the system
-$router->post('/register', [
-    'as' => 'register', 'uses' => 'UserController@register'
-]);
+$router->options(
+    '/{any:.*}', 
+    [
+        'middleware' => ['CORS'], 
+        function (){ 
+            return response(['status' => 'success']); 
+        }
+    ]
+);
+$router->group(['middleware' => 'CORS'], function($router){
+     //Below route will register the user in the system
+     $router->post('/register', [
+        'as' => 'register', 'uses' => 'UserController@register'
+    ]);
 
-//Below route will be used to generate a JWT token
-$router->post('/generateToken', [
-    'as' => 'generate.token', 'uses' => 'JWTController@generateToken'
-]);
+    //Below route will be used to generate a JWT token
+    $router->post('/generateToken', [
+        'as' => 'generate.token', 'uses' => 'JWTController@generateToken'
+    ]);
 
-$router->group(['middleware' => 'jwt.auth', 'prefix' => 'api_v1'], function () use ($router) {
-   $router->get('/', function() use($router){
-    return $router->app->version();
-   });
+    $router->group(['middleware' => 'jwt.auth', 'prefix' => 'api_v1'], function () use ($router) {
+        $router->get('/', function() use($router){
+            return $router->app->version();
+        });
+    });
 });
