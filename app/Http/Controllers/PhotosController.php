@@ -21,11 +21,72 @@ class PhotosController extends Controller
     {
         $this->middleware('jwt.auth');
         $this->currentEndpoint = '/photos';
+        $this->validParams = array('page', 'per_page', 'order_by');
     }
 
-    public function index(){
-        return $this->performRequest();
+    public function index(Request $request){
+        $queryArr = array();
+
+        foreach($request->all() as $reqKeys => $reqVars){
+            if(in_array($reqKeys, $this->validParams) && $reqVars){
+                $queryArr[$reqKeys] = $reqVars;
+            }
+        }
+
+        return $this->performRequest('', $queryArr);
     } 
+
+    //Extract HTTP headers and return the required values
+    private function getHeaderResponse($httpResponse = array()){
+        $returnArr = array();
+        if(count($httpResponse) == 0) return $returnArr;
+
+        //Total number of pages
+        if($httpResponse->getHeader('X-Total')){
+            $totalPages = $httpResponse->getHeader('X-Total');
+            $returnArr['pagination']['total_pages'] = $totalPages[0];
+        }
+
+        //Paginations
+        if($httpResponse->getHeader('Link')){
+            $linkString = $httpResponse->getHeader('Link');
+            $tmpArr = explode(',', $linkString[0]);
+
+            if($tmpArr && count($tmpArr) > 0){
+                foreach($tmpArr as $tmpObj){
+                    list($link, $linkType) = explode(';', str_ireplace(array('rel=', '"', '<', '>'), '', $tmpObj));
+                    if($link && $linkType){
+                        $link = parse_url($link);
+                        if($link['query']){
+                            $link = $link['query'];
+                            if(stripos($link, '&') === false){
+                                $link = str_ireplace('page=', '', trim($link));
+                                $linkType = str_ireplace('page=', '', trim($linkType));
+
+                                if($linkType == 'next') $linkType = 'page';
+                                $returnArr['pagination'][$linkType] = $link;
+                            }else{
+                                $paramTmp = explode('&', $link);
+                                if(is_array($paramTmp) && count($paramTmp) > 0 ){
+                                    foreach($paramTmp as $tmpPrm){
+                                        if(stripos($tmpPrm, '=') === false){
+
+                                        }else{
+                                            list($prmName, $prmVal) = explode('=', $tmpPrm);
+                                            if($prmName && $prmVal) $returnArr['pagination'][trim($prmName)] = str_ireplace('page=', '', trim($prmVal));
+                                        }
+                                    }
+                                }
+                            }
+                            
+                        } 
+                    }
+                }
+            }
+        }
+
+        return $returnArr;
+    }
 
     private function performRequest($endpoint = '', $sendParams = array()){
         try{
@@ -52,8 +113,17 @@ class PhotosController extends Controller
             $responseBody = json_decode($response->getBody()->getContents(), true);
 
             if($responseBody){
+                $responseArr = array(
+                    'data' => $responseBody
+                );
+
+                //Fetch required info from response headers
+                $headersArr = $this->getHeaderResponse($response);
+                if(count($headersArr) > 0) $responseArr['extra_info'] = $headersArr;
+                
+                //Return response
                 return response()->json([
-                    'success' => $responseBody
+                    'success' => $responseArr
                 ], 200);
             }
 
