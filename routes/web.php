@@ -37,6 +37,7 @@ $router->group(['middleware' => 'CORS'], function($router){
         ]);
 
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'photos'], function() use ($router){
+            $router->get('/{picId}', 'PhotosController@getPhoto');
             $router->get('/', 'PhotosController@index');
         });
     });

@@ -24,6 +24,7 @@ class PhotosController extends Controller
         $this->validParams = array('page', 'per_page', 'order_by');
     }
 
+    //Returns the data for index page
     public function index(Request $request){
         $queryArr = array();
 
@@ -34,7 +35,13 @@ class PhotosController extends Controller
         }
 
         return $this->performRequest('', $queryArr);
-    } 
+    }
+    
+    //Returns details for the required image id
+    public function getPhoto(Request $request, $picId = 0){
+        $endPoint = (empty($picId) == false) ? $this->currentEndpoint.'/'.$picId : $this->currentEndpoint;
+        return $this->performRequest($endPoint);
+    }
 
     //Extract HTTP headers and return the required values
     private function getHeaderResponse($httpResponse = array()){
