@@ -40,5 +40,9 @@ $router->group(['middleware' => 'CORS'], function($router){
             $router->get('/{picId}', 'PhotosController@getPhoto');
             $router->get('/', 'PhotosController@index');
         });
+
+        $router->group(['middleware' => 'jwt.auth', 'prefix' => 'users'], function() use ($router){
+            $router->get('/{username}', 'SplashUserController@getUser');
+        });
     });
 });
