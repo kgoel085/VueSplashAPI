@@ -24,8 +24,9 @@ class SplashUserController extends Controller
     }
     
     //Returns details for the required image id
-    public function getUser(Request $request, $username = 0){
+    public function getUser(Request $request, $username = 0, $action = null){
         $endPoint = (empty($username) == false) ? $this->currentEndpoint.'/'.$username : $this->currentEndpoint;
+        if(empty($endPoint) == false && empty($action == false)) $endPoint  = $endPoint."/".$action;
         return $this->performRequest($endPoint);
     }
 

@@ -42,6 +42,7 @@ $router->group(['middleware' => 'CORS'], function($router){
         });
 
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'users'], function() use ($router){
+            $router->get('/{username}/action/{action}', 'SplashUserController@getUser');
             $router->get('/{username}', 'SplashUserController@getUser');
         });
     });
