@@ -46,5 +46,11 @@ $router->group(['middleware' => 'CORS'], function($router){
             $router->get('/{username}/action/{action}', 'SplashUserController@getUser');
             $router->get('/{username}', 'SplashUserController@getUser');
         });
+
+        $router->group(['middleware' => 'jwt.auth', 'prefix' => 'collections'], function() use ($router){
+            $router->get('/{id}/{action}', 'CollectionController@getCollection');
+            $router->get('/{id}', 'CollectionController@getCollection');
+            $router->get('/', 'CollectionController@index');
+        });
     });
 });
