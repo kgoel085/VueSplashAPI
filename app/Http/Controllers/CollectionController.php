@@ -41,9 +41,10 @@ class CollectionController extends Controller
     }
     
     //Returns details for the required collection id
-    public function getCollection(Request $request, $collectionId = 0, $action = null){
-        $endPoint = (empty($collectionId) == false) ? $this->currentEndpoint.'/'.$collectionId : $this->currentEndpoint;
+    public function getCollection(Request $request, $id = 0, $action = null){
+        $endPoint = (empty($id) == false) ? $this->currentEndpoint.'/'.$id : $this->currentEndpoint;
         if(empty($endPoint) == false && empty($action == false)) $endPoint  = $endPoint."/".$action;
+
         return $this->performRequest($endPoint);
     }
 
