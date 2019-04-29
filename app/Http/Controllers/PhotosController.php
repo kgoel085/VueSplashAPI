@@ -39,9 +39,17 @@ class PhotosController extends Controller
     
     //Returns details for the required image id
     public function getPhoto(Request $request, $picId = 0, $action = null){
+        $queryArr = array();
+
+        foreach($request->all() as $reqKeys => $reqVars){
+            if(in_array($reqKeys, $this->validParams) && $reqVars){
+                $queryArr[$reqKeys] = $reqVars;
+            }
+        }
+
         $endPoint = (empty($picId) == false) ? $this->currentEndpoint.'/'.$picId : $this->currentEndpoint;
         if(empty($endPoint) == false && empty($action == false)) $endPoint  = $endPoint."/".$action;
-        return $this->performRequest($endPoint);
+        return $this->performRequest($endPoint, $queryArr);
     }
 
     //Extract HTTP headers and return the required values
