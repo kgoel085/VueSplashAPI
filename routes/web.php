@@ -37,20 +37,24 @@ $router->group(['middleware' => 'CORS'], function($router){
         ]);
 
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'photos'], function() use ($router){
-            $router->get('/{picId}/action/{action}', 'PhotosController@getPhoto');
-            $router->get('/{picId}', 'PhotosController@getPhoto');
-            $router->get('/', 'PhotosController@index');
+            $router->get('/{picId}/action/{action}', 'EndpointController@getPhoto');
+            $router->get('/{picId}', 'EndpointController@getPhoto');
+            $router->get('/', 'EndpointController@getPhoto');
         });
 
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'users'], function() use ($router){
-            $router->get('/{username}/action/{action}', 'SplashUserController@getUser');
-            $router->get('/{username}', 'SplashUserController@getUser');
+            $router->get('/{username}/action/{action}', 'EndpointController@getUser');
+            $router->get('/{username}', 'EndpointController@getUser');
         });
 
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'collections'], function() use ($router){
-            $router->get('/{id}/{action}', 'CollectionController@getCollection');
-            $router->get('/{id}', 'CollectionController@getCollection');
-            $router->get('/', 'CollectionController@index');
+            $router->get('/{id}/{action}', 'EndpointController@getCollection');
+            $router->get('/{id}', 'EndpointController@getCollection');
+            $router->get('/', 'EndpointController@getCollection');
+        });
+
+        $router->group(['middleware' => 'jwt.auth', 'prefix' => 'search'], function() use ($router){
+            $router->get('/{id}/{action}', 'EndpointController@getSearch');
         });
     });
 });
