@@ -17,12 +17,10 @@ class CreateRequestLogs extends Migration
             $table->bigIncrements('id');
             $table->integer('user_id');
             $table->string('ip');
-            $table->string('route_name');
+            $table->string('server_url');
             $table->string('route_path');
             $table->json('request');
             $table->string('request_method');
-            $table->json('request_headers');
-            $table->json('response_headers');
             $table->string('response_status');
             $table->json('response');
             $table->timestamps();
