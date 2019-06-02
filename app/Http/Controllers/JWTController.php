@@ -101,6 +101,9 @@ class JWTController extends Controller
             $response = $response->withCookie(new Cookie($cookieName, $newToken, env('JWT_EXPIRY')));
         }
 
+        // Add associated user id to the request object
+        if($this->authUser) $this->reqVars->auth = $this->authUser;
+        
         return $response;
     }
 

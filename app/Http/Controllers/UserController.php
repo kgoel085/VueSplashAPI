@@ -49,6 +49,9 @@ class UserController extends Controller
             ], 400);
         }
 
+        // Add associated user id to the request object
+        if($user) $request->auth = $user;
+
         return response()->json([
             'success' => 'User registered successfully'
         ], 200);
