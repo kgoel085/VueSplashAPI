@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
 
 class RequestLog extends Model
 {
@@ -32,5 +33,10 @@ class RequestLog extends Model
 
     public function user(){
         return $this->belongsTo(User::class, 'users');
+    }
+
+    // Returns all the columns in the table
+    public function getTableColumns(){
+        return Schema::getColumnListing($this->getTable());
     }
 }
