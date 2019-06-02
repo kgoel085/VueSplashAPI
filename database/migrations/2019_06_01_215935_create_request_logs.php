@@ -19,10 +19,10 @@ class CreateRequestLogs extends Migration
             $table->string('ip');
             $table->string('server_url');
             $table->string('route_path');
-            $table->json('request');
+            $table->text('request');
             $table->string('request_method');
             $table->string('response_status');
-            $table->json('response');
+            $table->text('response');
             $table->timestamps();
         });
     }
