@@ -15,7 +15,7 @@ class RequestLog extends Model
      * @var array
      */
     protected $fillable = [
-        'ip', 'route_name', 'route_path', 'request', 'request_headers', 'response_headers', 'response_status', 'response'
+        'ip', 'server_url', 'user_id', 'route_path', 'request', 'request_method', 'response_status', 'response'
     ];
 
     /**
