@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Permission;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
     }
 
     public function boot(){
+        // Sql String length error fix
+        Schema::defaultStringLength(191);
+
         //To add custom roues -- Example
         // $this->app['router']->group(['prefix' => 'my-module'], function ($router) {
         //     $router->get('my-route', 'MyVendor\MyPackage\MyController@action');
