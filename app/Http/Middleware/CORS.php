@@ -108,8 +108,13 @@ class CORS
 
     // Log every request in the DB after response is ready to be dispatched
     public function terminate($request, $response){
-        $reqLogObj = new RequestLog;
-        $reqLogObj->insertLogs($request, $response);
+        try {
+            $reqLogObj = new RequestLog;
+            $reqLogObj->insertLogs($request, $response);
+        } catch (\Throwable $th) {
+            
+        }
+        
     }
 }
 
