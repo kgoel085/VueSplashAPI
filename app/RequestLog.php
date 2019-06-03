@@ -15,7 +15,7 @@ class RequestLog extends Model
      * @var array
      */
     protected $fillable = [
-        'ip', 'server_url', 'user_id', 'route_path', 'request', 'request_method', 'response_status', 'response'
+        'ip', 'server_url', 'user_id', 'route_path', 'request', 'request_method', 'response_status', 'response', 'server'
     ];
 
     /**
@@ -74,12 +74,33 @@ class RequestLog extends Model
                 // Check for Real IP
                 if($this->checkIP($request)) $reqArr['ip'] = $this->checkIP($request);
 
+                // API Auth Token
+                if($request->bearerToken()) $reqArr['token'] = $request->bearerToken();
+
                 // Server / Route paths
                 if($routeObj['server']) $reqArr['server'] = $routeObj['server'];
                 if($request->getPathInfo()) $reqArr['route_path'] = $routeObj['endpoint'];
 
                 // Req method
                 if($request->getMethod()) $reqArr['request_method'] = $request->method(); 
+
+                // Request data
+                $tmpReqArr = [];    
+                // Request Parameters
+                if($request->all()) $tmpReqArr['params'] = $request->all();
+
+                // Request Headers
+                if($request->headers->all()) $tmpReqArr['Headers'] = $request->headers->all();
+                if(count($tmpReqArr) > 0) $reqArr['request'] = json_encode($tmpReqArr);
+
+                // Response status
+                if($response->status()) $reqArr['response_status'] = $response->status();
+
+                // Response data
+                $tmpResponseArr = [];
+                if($response->headers->all()) $tmpResponseArr['headers'] = $response->headers->all();
+                if($response->getContent()) $tmpResponseArr['response'] = $response->getContent();
+                if(count($tmpResponseArr) > 0) $reqArr['response'] = json_encode($tmpResponseArr);
 
                 if(count($reqArr) > 0){
                     $this->create($reqArr)->save();
