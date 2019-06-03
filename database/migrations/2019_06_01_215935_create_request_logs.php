@@ -16,10 +16,10 @@ class CreateRequestLogs extends Migration
         Schema::create('request_logs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('user_id')->nullable();
-            $table->string('token')->nullable();
-            $table->string('ip')->nullable();
-            $table->string('server')->nullable();
-            $table->string('route_path')->nullable();
+            $table->text('token')->nullable();
+            $table->text('ip')->nullable();
+            $table->text('server')->nullable();
+            $table->text('route_path')->nullable();
             $table->text('request')->nullable();
             $table->string('request_method')->nullable();
             $table->string('response_status')->nullable();
