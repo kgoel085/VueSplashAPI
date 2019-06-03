@@ -15,14 +15,15 @@ class CreateRequestLogs extends Migration
     {
         Schema::create('request_logs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('user_id');
-            $table->string('ip');
-            $table->string('server_url');
-            $table->string('route_path');
-            $table->text('request');
-            $table->string('request_method');
-            $table->string('response_status');
-            $table->text('response');
+            $table->integer('user_id')->nullable();
+            $table->string('token')->nullable();
+            $table->string('ip')->nullable();
+            $table->string('server')->nullable();
+            $table->string('route_path')->nullable();
+            $table->text('request')->nullable();
+            $table->string('request_method')->nullable();
+            $table->string('response_status')->nullable();
+            $table->text('response')->nullable();
             $table->timestamps();
         });
     }
