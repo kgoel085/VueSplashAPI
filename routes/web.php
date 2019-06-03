@@ -25,36 +25,33 @@ $router->options(
     ]
 );
 $router->group(['middleware' => 'CORS'], function($router){
-    $router->group(['prefix' => 'api_v1'], function () use ($router) {
-        //Below route will register the user in the system
-        $router->post('/register', [
-            'as' => 'register', 'uses' => 'UserController@register'
-        ]);
+    $router->group(['prefix' => 'VueSplash'], function () use ($router) {
 
         //Below route will be used to generate a JWT token
-        $router->post('/generateToken', [
-            'as' => 'generate.token', 'uses' => 'JWTController@generateToken'
-        ]);
+        $router->post('/generateToken', ['as' => 'global.generateToken', 'uses' => 'JWTController@generateToken']);
+
+        //Below route will register the user in the system
+        $router->post('/register', ['as' => 'global.register', 'middleware' => 'jwt.auth', 'uses' => 'UserController@register']);
 
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'photos'], function() use ($router){
-            $router->get('/{picId}/action/{action}', 'EndpointController@getPhoto');
-            $router->get('/{picId}', 'EndpointController@getPhoto');
-            $router->get('/', 'EndpointController@getPhoto');
+            $router->get('/{picId}/action/{action}', ['as' => 'photos.action', 'uses' => 'EndpointController@getPhoto']);
+            $router->get('/{picId}', ['as' => 'photos.specificPhoto', 'uses' => 'EndpointController@getPhoto']);
+            $router->get('/', ['as' => 'photos.all', 'uses' => 'EndpointController@getPhoto']);
         });
 
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'users'], function() use ($router){
-            $router->get('/{username}/action/{action}', 'EndpointController@getUser');
-            $router->get('/{username}', 'EndpointController@getUser');
+            $router->get('/{username}/action/{action}', ['as' => 'user.action', 'uses' => 'EndpointController@getUser']);
+            $router->get('/{username}', ['as' => 'user.specificUser', 'uses' => 'EndpointController@getUser']);
         });
 
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'collections'], function() use ($router){
-            $router->get('/{id}/{action}', 'EndpointController@getCollection');
-            $router->get('/{id}', 'EndpointController@getCollection');
-            $router->get('/', 'EndpointController@getCollection');
+            $router->get('/{id}/{action}', ['as' => 'collection.action', 'uses' => 'EndpointController@getCollection']);
+            $router->get('/{id}', ['as' => 'collection.specificCollection', 'uses' => 'EndpointController@getCollection']);
+            $router->get('/', ['as' => 'collection.all', 'uses' => 'EndpointController@getCollection']);
         });
 
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'search'], function() use ($router){
-            $router->get('/{id}/{action}', 'EndpointController@getSearch');
+            $router->get('/{id}/{action}', ['as' => 'data.Search', 'uses' => 'EndpointController@getSearch']);
         });
     });
 });
