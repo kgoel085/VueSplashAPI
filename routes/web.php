@@ -18,14 +18,14 @@
 $router->options(
     '/{any:.*}', 
     [
-        'middleware' => ['CORS'], 
+        'middleware' => 'CORS',
         function (){ 
             return response(['status' => 'success']); 
         }
     ]
 );
 $router->group(['middleware' => 'CORS'], function($router){
-    $router->group(['prefix' => 'VueSplash'], function () use ($router) {
+    $router->group(['prefix' => 'vuesplash'], function () use ($router) {
 
         //Below route will be used to generate a JWT token
         $router->post('/generateToken', ['as' => 'global.generateToken', 'uses' => 'JWTController@generateToken']);
