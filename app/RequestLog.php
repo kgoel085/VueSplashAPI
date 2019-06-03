@@ -42,27 +42,44 @@ class RequestLog extends Model
 
     // Insert request logs
     public function insertLogs($request = false, $response = false){
+        // Route Array
+        //$routeObj = app()->router->getRoutes()[$request->method() . $request->getPathInfo()];
+        $routeObj = (array_key_exists(1,$request->route())) ? $request->route()[1] : false;
+
+        if($routeObj){
+            // Add current route current path in object
+            if($request->getPathInfo()) $routeObj['uri'] = $request->getPathInfo();
+
+            // Format Called Server && API Endpoint
+            if($routeObj['uri']){
+                $tmpArr = array_values(array_filter(explode('/', $routeObj['uri'])));
+
+                // Called API for
+                $routeObj['server'] = array_shift($tmpArr);
+                
+                // Route path
+                if(count($tmpArr) > 0) $routeObj['endpoint'] = '/'.implode('/', $tmpArr);
+            }
+        }
+
         // Manage Request data
-        if($request && $request->auth){
+        if($request){
             $reqCols = ($this->getTableColumns()) ? $this->getTableColumns() : [];
 
             $reqArr = [];
             if(count($reqCols) > 0){
                 // User ID
-                if($request->auth->id) $reqArr['user_id'] = $request->auth->id;
+                if($request->auth && $request->auth->id) $reqArr['user_id'] = $request->auth->id;
 
                 // Check for Real IP
                 if($this->checkIP($request)) $reqArr['ip'] = $this->checkIP($request);
 
                 // Server / Route paths
-                if(url()) $reqArr['server_url'] = url();
-                if($request->getPathInfo()) $reqArr['route_path'] = $request->getPathInfo();
+                if($routeObj['server']) $reqArr['server'] = $routeObj['server'];
+                if($request->getPathInfo()) $reqArr['route_path'] = $routeObj['endpoint'];
 
                 // Req method
-                if($request->getMethod()) $reqArr['request_method'] = $request->getMethod(); 
-
-                // Req status
-                if($response->status()) $reqArr['response_status'] = $response->status();
+                if($request->getMethod()) $reqArr['request_method'] = $request->method(); 
 
                 if(count($reqArr) > 0){
                     $this->create($reqArr)->save();
