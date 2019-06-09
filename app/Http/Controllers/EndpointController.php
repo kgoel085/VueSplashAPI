@@ -86,7 +86,7 @@ class EndpointController extends Controller
     //Extract HTTP headers and return the required values
     private function getHeaderResponse($httpResponse = false){
         $returnArr = array();
-        if($httpResponse) return $returnArr;
+        if(!$httpResponse) return $returnArr;
 
         //Total number of pages
         if($httpResponse->getHeader('X-Total')){
