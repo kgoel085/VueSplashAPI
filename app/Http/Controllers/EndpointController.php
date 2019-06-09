@@ -84,9 +84,9 @@ class EndpointController extends Controller
     }
 
     //Extract HTTP headers and return the required values
-    private function getHeaderResponse($httpResponse = array()){
+    private function getHeaderResponse($httpResponse = false){
         $returnArr = array();
-        if(count($httpResponse) == 0) return $returnArr;
+        if($httpResponse) return $returnArr;
 
         //Total number of pages
         if($httpResponse->getHeader('X-Total')){
@@ -184,7 +184,9 @@ class EndpointController extends Controller
 
             if(empty($responseBodyAsString) == false){
                 $tmpStr = json_decode($responseBodyAsString, true);
-                dd($tmpStr);
+                if(array_key_exists('error', $tmpStr) && count($tmpStr['error']) > 0){
+                    $error['message'] = implode(','.PHP_EOL, array_unique($tmpStr));
+                }
             }
             
             return response()->json([
