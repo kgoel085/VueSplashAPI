@@ -39,7 +39,7 @@ class JWTAuth
         }
 
         try {
-            $credentials = JWT::decode($token, env('JWT_SECRET'), [env('JWT_ALGO')]);
+            $credentials = JWT::decode($token, env('JWT_SECRET'), [env('JWT_ALGO', 'HS256')]);
 
             //Check the issuer is valid or not
             if(!Hash::check(env('APP_NAME'), $credentials->iss)){
