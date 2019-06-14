@@ -33,6 +33,9 @@ $router->group(['middleware' => 'CORS'], function($router){
         //Below route will register the user in the system
         $router->post('/register', ['as' => 'global.register', 'middleware' => 'jwt.auth', 'uses' => 'UserController@register']);
 
+        // Returns variable required for login
+        $router->get('/initLogin', ['as' => 'init.login', 'middleware' => 'jwt.auth', 'uses' => 'LoginController@initiate']);
+
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'photos'], function() use ($router){
             $router->get('/{picId}/action/{action}', ['as' => 'photos.action', 'uses' => 'EndpointController@getPhoto']);
             $router->get('/{picId}', ['as' => 'photos.specificPhoto', 'uses' => 'EndpointController@getPhoto']);
