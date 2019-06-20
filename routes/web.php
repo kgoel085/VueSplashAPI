@@ -36,6 +36,9 @@ $router->group(['middleware' => 'CORS'], function($router){
         // Returns variable required for login
         $router->get('/initLogin', ['as' => 'init.login', 'middleware' => 'jwt.auth', 'uses' => 'LoginController@initiate']);
 
+        // Get unsplash user auth token for user details
+        $router->post('/oauth', ['as' => 'ini.oauth', 'middleware' => 'jwt.auth', 'uses' => 'LoginController@oauth']);
+
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'photos'], function() use ($router){
             $router->get('/{picId}/action/{action}', ['as' => 'photos.action', 'uses' => 'EndpointController@getPhoto']);
             $router->get('/{picId}', ['as' => 'photos.specificPhoto', 'uses' => 'EndpointController@getPhoto']);
