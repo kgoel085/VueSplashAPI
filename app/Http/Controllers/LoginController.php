@@ -8,11 +8,13 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
+use Symfony\Component\HttpFoundation\Cookie;
+
 class LoginController extends BaseController
 {
     public function initiate(){
         $returnArr = [
-            'client_id' => env('CLIENT_ACCESS_KEY'),
+            'cd' => env('CLIENT_ACCESS_KEY'),
             'response_type' => 'code'
         ];
 
@@ -22,7 +24,7 @@ class LoginController extends BaseController
     // Generate auth token to retrieve unsplash user details
     public function oauth(Request $request){
         $code = ($request->code) ? $request->code : false;
-
+        //dd($code);
         if($code){
             try{
                 $client = new Client();
@@ -45,9 +47,15 @@ class LoginController extends BaseController
                     );
                         
                     //Return response
-                    return response()->json([
+                    $response = response()->json([
                         'success' => $responseArr
                     ], 200);
+
+                    // Attach Cookie
+                    $cookieData = json_encode(array('act' => $responseBody['access_token'], 'scp' => $responseBody['scope'], 'us' => $request->auth->id));
+                    $response->withCookie(new Cookie('vsu', $cookieData, 1440*5));
+
+                    return $response;
                 }
             }catch(ClientException $e){
 
