@@ -49,6 +49,10 @@ class EndpointController extends Controller
 
         $endPoint = (empty($username) == false) ? $this->currentEndpoint.'/'.$username : $this->currentEndpoint;
         if(empty($endPoint) == false && empty($action == false)) $endPoint  = $endPoint."/".$action;
+
+        // Change endpoint, if private date is requested
+        if($username == 'init' && $action == 'me') $endPoint = '/me';
+
         return $this->performRequest($endPoint);
     }
     
@@ -190,7 +194,7 @@ class EndpointController extends Controller
 
             if(empty($responseBodyAsString) == false){
                 $tmpStr = json_decode($responseBodyAsString, true);
-                if(array_key_exists('error', $tmpStr) && count($tmpStr['error']) > 0){
+                if($tmpStr && array_key_exists('error', $tmpStr) && count($tmpStr['error']) > 0){
                     $error['message'] = implode(','.PHP_EOL, array_unique($tmpStr));
                 }
             }
