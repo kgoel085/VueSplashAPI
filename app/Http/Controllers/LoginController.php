@@ -43,7 +43,7 @@ class LoginController extends BaseController
                 
                 if($responseBody){
                     $responseArr = array(
-                        'data' => $responseBody
+                        'data' => $responseBody['access_token']
                     );
                         
                     //Return response
