@@ -52,8 +52,8 @@ class LoginController extends BaseController
                     ], 200);
 
                     // Attach Cookie
-                    $cookieData = json_encode(array('act' => $responseBody['access_token'], 'scp' => $responseBody['scope'], 'us' => $request->auth->id));
-                    $response->withCookie(new Cookie('vsu', $cookieData, 1440*5));
+                    //$cookieData = json_encode(array('act' => $responseBody['access_token'], 'scp' => $responseBody['scope'], 'us' => $request->auth->id));
+                    //$response->withCookie(new Cookie('vsu', $cookieData, 1440));
 
                     return $response;
                 }
