@@ -31,6 +31,9 @@ class JWTAuth
             if(end($tmpArr)) $token = end($tmpArr);
         }
 
+        // Store the current authorized user token
+        if($request->header('x-usrr-cred')) $request->unsplashUser = $request->header('x-usrr-cred');
+
         if(!$token) {
             // Unauthorized response if token not there
             return response()->json([

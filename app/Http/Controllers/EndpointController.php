@@ -16,12 +16,15 @@ class EndpointController extends Controller
      */
 
     private $currentEndpoint;
+    private $authHeader;
      
-    public function __construct()
+    public function __construct(Request $request)
     {
         $this->middleware('jwt.auth');
         //$this->currentEndpoint = '/';
         $this->validParams = array('page', 'per_page', 'order_by', 'featured', 'query');
+        
+        if($request->unsplashUser) $this->authHeader = $request->unsplashUser; 
     }
 
     //Returns details for the required image id
@@ -150,6 +153,9 @@ class EndpointController extends Controller
                 'Accept-Version' => 'v1',
                 'Authorization' => 'Client-ID '.env('CLIENT_ACCESS_KEY')
             );
+
+            // Attach unsplash auth token, if present
+            if($this->authHeader) $headersArr['Authorization'] = 'Bearer '.$this->authHeader;
             
             $response = $client->request('GET', $endpoint, [
                 'query' => $sendParams,
