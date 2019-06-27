@@ -9,6 +9,7 @@ use App\User;
 Use Firebase\JWT\JWT;
 use Firebase\JWT\ExpiredException;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Crypt;
 
 class JWTAuth
 {
@@ -24,12 +25,26 @@ class JWTAuth
         $token = null;
 
         /**
+         * Get token from cookies
+        */
+            $tokenArr = [];
+
+        // Payload
+            if($request->cookie(env('JWT_COOKIE_PAYLOAD'))) $tokenArr[] = $request->cookie(env('JWT_COOKIE_PAYLOAD'));
+
+        // Signature
+            if($request->cookie(env('JWT_COOKIE_SIG'))) $tokenArr[] = Crypt::decrypt($request->cookie(env('JWT_COOKIE_SIG')));
+
+        // Make JWT token
+            if(count($tokenArr) > 0) $token = implode('.', $tokenArr);
+
+        /**
          * Get the token from Bearer as it is the only valid way to send the token
          */
-        if($request->header('Authorization')){
-            $tmpArr = explode(' ',$request->header('Authorization'));
-            if(end($tmpArr)) $token = end($tmpArr);
-        }
+        // if($request->header('Authorization')){
+        //     $tmpArr = explode(' ',$request->header('Authorization'));
+        //     if(end($tmpArr)) $token = end($tmpArr);
+        // }
 
         // Store the current authorized user token
         if($request->header('x-usrr-cred')) $request->unsplashUser = $request->header('x-usrr-cred');
