@@ -17,6 +17,7 @@ class JWTController extends Controller
 
     private $reqVars;
     private $authUser;
+    private $expiryTime;
 
     /**
      * Create a new controller instance.
@@ -29,6 +30,9 @@ class JWTController extends Controller
         
         //Validate current user
         $this->validateUser();
+
+        // Expiry time for token
+        $this->expiryTime = time() + (env('JWT_EXPIRY') * 10);
     }
 
     /**
@@ -81,7 +85,7 @@ class JWTController extends Controller
             'iss' => Hash::make(env('APP_NAME')),
             'sub' => $this->authUser->id,
             'iat' => time(),
-            'exp' => time() + env('JWT_EXPIRY', 10)*60
+            'exp' => $this->expiryTime
         ];
 
         if(count($arr) > 0) $payload = array_merge($arr, $payload);
@@ -98,12 +102,12 @@ class JWTController extends Controller
 
         if(env('JWT_COOKIE') == true && env('JWT_COOKIE_NAME', null)){
             $cookieName = env('JWT_COOKIE_NAME');
-            $response = $response->withCookie(new Cookie($cookieName, $newToken, env('JWT_EXPIRY')));
+            $cookieTime = $this->expiryTime;
+            $response = $response->withCookie(new Cookie($cookieName, $newToken, $cookieTime));
         }
 
         // Add associated user id to the request object
         if($this->authUser) $this->reqVars->auth = $this->authUser;
-        
         return $response;
     }
 
