@@ -10,7 +10,8 @@ class CORS
 {
     protected $settings = array(
         'origin' => '*',    // Wide Open!
-        'allowMethods' => 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS',
+        'allowMethods' => 'GET,POST,OPTIONS',
+        'allowCredentials' => true
     );
 
     protected function setOrigin($req, $rsp) {
@@ -96,6 +97,11 @@ class CORS
      * @return mixed
      */
     public function handle($request, Closure $next) {
+        // Overwriting default values
+        
+        // change origin settings
+        $this->settings['origin'] = env('APP_ORIGIN', '*');
+
         if ($request->isMethod('OPTIONS')) {
             $response = new Response("", 200);
         }
