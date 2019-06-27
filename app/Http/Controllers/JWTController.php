@@ -113,7 +113,7 @@ class JWTController extends Controller
 
         // Token Payload Cookie
         $tokenPayload = implode('.', $newToken);
-        if($tokenPayload) $response = $response->withCookie(new Cookie(env('JWT_COOKIE_PAYLOAD'), $tokenPayload, $cookieTime, null, null, false, false));
+        if($tokenPayload) $response = $response->withCookie(new Cookie(env('JWT_COOKIE_PAYLOAD'), Crypt::encrypt($tokenPayload), $cookieTime, null, null, false, false));
 
         // Add associated user id to the request object
         if($this->authUser) $this->reqVars->auth = $this->authUser;

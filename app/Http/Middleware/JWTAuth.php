@@ -30,7 +30,7 @@ class JWTAuth
             $tokenArr = [];
 
         // Payload
-            if($request->cookie(env('JWT_COOKIE_PAYLOAD'))) $tokenArr[] = $request->cookie(env('JWT_COOKIE_PAYLOAD'));
+            if($request->cookie(env('JWT_COOKIE_PAYLOAD'))) $tokenArr[] = Crypt::decrypt($request->cookie(env('JWT_COOKIE_PAYLOAD')));
 
         // Signature
             if($request->cookie(env('JWT_COOKIE_SIG'))) $tokenArr[] = Crypt::decrypt($request->cookie(env('JWT_COOKIE_SIG')));
