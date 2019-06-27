@@ -11,6 +11,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\ExpiredException;
 
 use Symfony\Component\HttpFoundation\Cookie;
+use Illuminate\Support\Facades\Crypt;
 
 class JWTController extends Controller
 {
@@ -98,18 +99,24 @@ class JWTController extends Controller
      */
     public function generateToken($tokenExtras = array()){
         $newToken = $this->jwtToken($tokenExtras);
-        $response = response()->json(['success' => ['token' => $newToken]], 200);
+        if($newToken) $newToken = explode('.', $newToken);
 
-        if(env('JWT_COOKIE') == true && env('JWT_COOKIE_NAME', null)){
-            $cookieName = env('JWT_COOKIE_NAME');
-            $cookieTime = $this->expiryTime;
-            $response = $response->withCookie(new Cookie($cookieName, $newToken, $cookieTime));
+        $response = response()->json(['success' => true], 200);
+        $cookieTime = $this->expiryTime;
+
+        // Token Signature Cookie
+        $tokenSig = array_pop($newToken);
+        if($tokenSig){
+            $encryptSignature = Crypt::encrypt($tokenSig);
+            $response = $response->withCookie(new Cookie(env('JWT_COOKIE_SIG'), $encryptSignature, $cookieTime));
         }
+
+        // Token Payload Cookie
+        $tokenPayload = implode('.', $newToken);
+        if($tokenPayload) $response = $response->withCookie(new Cookie(env('JWT_COOKIE_PAYLOAD'), $tokenPayload, $cookieTime, null, null, false, false));
 
         // Add associated user id to the request object
         if($this->authUser) $this->reqVars->auth = $this->authUser;
         return $response;
     }
-
-    
 }
