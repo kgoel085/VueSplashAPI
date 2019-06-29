@@ -45,8 +45,8 @@ class JWTController extends Controller
     public function validator(Request $data)
     {
         $this->validate($data, [
-            'email' => ['required', 'string', 'email', 'exists:users'],
-            'password' => ['required', 'string'],
+            //'email' => ['required', 'string', 'email', 'exists:users'],
+            //'password' => ['required', 'string'],
             'account' => ['required', 'string', 'exists:users']
         ]);
     }
@@ -61,15 +61,16 @@ class JWTController extends Controller
             $this->validator($this->reqVars);
 
             //Validate the user
-            $user = User::where([['email', '=', $this->reqVars->input('email')], ['account', '=', $this->reqVars->input('account')]])->first();
+            //$user = User::where([['email', '=', $this->reqVars->input('email')], ['account', '=', $this->reqVars->input('account')]])->first();
+            $user = User::where([['account', '=', $this->reqVars->input('account')]])->first();
             if(!$user){
                 return response()->json(['error' => 'Invalid login provided.'], 401);
             }
 
             //validate the password
-            if (!Hash::check($this->reqVars->input('password'), $user->password)) {
-                return response()->json(['error' => 'Invalid password provided'], 401);
-            }
+            // if (!Hash::check($this->reqVars->input('password'), $user->password)) {
+            //     return response()->json(['error' => 'Invalid password provided'], 401);
+            // }
 
             $this->authUser = $user;
         }
