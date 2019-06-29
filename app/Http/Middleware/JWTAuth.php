@@ -47,7 +47,10 @@ class JWTAuth
         // }
 
         // Store the current authorized user token
-        if($request->header('x-usrr-cred')) $request->unsplashUser = $request->header('x-usrr-cred');
+        if($request->cookie(env('JWT_COOKIE_LOGIN'))){
+            $loginAuth = Crypt::decrypt($request->cookie(env('JWT_COOKIE_LOGIN')));
+            if($loginAuth) $request->unsplashUser = $loginAuth;
+        }
 
         if(!$token) {
             // Unauthorized response if token not there
