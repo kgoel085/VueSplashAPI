@@ -48,16 +48,10 @@ class LoginController extends BaseController
                         'success' => true
                     ], 200);
 
-                    $expiryTime = time() + (env('JWT_EXPIRY') * 10);
+                    $expiryTime = time() + (env('JWT_EXPIRY') * 100);
                     $encryptSignature = Crypt::encrypt($responseBody['access_token']);
                     if($encryptSignature){
-                        $encrpyt1 = substr($encryptSignature, 0, strlen($encryptSignature) / 2);
-                        $encrpyt2 = substr($encryptSignature, strlen($encryptSignature) / 2, strlen($encryptSignature));
-
-                        if($encrpyt1 && $encrpyt2){
-                            $response = $response->withCookie(new Cookie(env('JWT_COOKIE_LOGIN_1'), $encrpyt1, $expiryTime));
-                            $response = $response->withCookie(new Cookie(env('JWT_COOKIE_LOGIN_2'), $encrpyt2, $expiryTime, null, null, false, false));
-                        }
+                        $response = $response->withCookie(new Cookie(env('JWT_COOKIE_LOGIN'), $encryptSignature, $expiryTime, null, null, false, false));
                     }
 
                     // Attach Cookie
