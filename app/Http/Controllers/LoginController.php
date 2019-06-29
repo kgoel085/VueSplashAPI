@@ -9,6 +9,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
 use Symfony\Component\HttpFoundation\Cookie;
+use Illuminate\Support\Facades\Crypt;
 
 class LoginController extends BaseController
 {
@@ -42,14 +43,22 @@ class LoginController extends BaseController
                 $responseBody = json_decode($response->getBody()->getContents(), true);
                 
                 if($responseBody){
-                    $responseArr = array(
-                        'data' => $responseBody['access_token']
-                    );
-                        
                     //Return response
                     $response = response()->json([
-                        'success' => $responseArr
+                        'success' => true
                     ], 200);
+
+                    $expiryTime = time() + (env('JWT_EXPIRY') * 10);
+                    $encryptSignature = Crypt::encrypt($responseBody['access_token']);
+                    if($encryptSignature){
+                        $encrpyt1 = substr($encryptSignature, 0, strlen($encryptSignature) / 2);
+                        $encrpyt2 = substr($encryptSignature, strlen($encryptSignature) / 2, strlen($encryptSignature));
+
+                        if($encrpyt1 && $encrpyt2){
+                            $response = $response->withCookie(new Cookie(env('JWT_COOKIE_LOGIN_1'), $encrpyt1, $expiryTime));
+                            $response = $response->withCookie(new Cookie(env('JWT_COOKIE_LOGIN_2'), $encrpyt2, $expiryTime, null, null, false, false));
+                        }
+                    }
 
                     // Attach Cookie
                     //$cookieData = json_encode(array('act' => $responseBody['access_token'], 'scp' => $responseBody['scope'], 'us' => $request->auth->id));
@@ -57,6 +66,7 @@ class LoginController extends BaseController
 
                     return $response;
                 }
+                
             }catch(ClientException $e){
 
                 $response = $e->getResponse();
