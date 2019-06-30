@@ -59,5 +59,7 @@ $router->group(['middleware' => 'CORS'], function($router){
         $router->group(['middleware' => 'jwt.auth', 'prefix' => 'search'], function() use ($router){
             $router->get('/{id}/{action}', ['as' => 'data.Search', 'uses' => 'EndpointController@getSearch']);
         });
+
+        $router->get('/logout/{action}', ['middleware' => 'jwt.auth', 'uses' => 'EndpointController@logout']);
     });
 });

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class EndpointController extends Controller
 {
@@ -205,5 +206,13 @@ class EndpointController extends Controller
         }
     }
 
-    //
+    // Log the user out
+    public function logout(Request $request, $action){
+        // Remove user related cookie
+        if($action == 'user' && $request->cookie(env('JWT_COOKIE_LOGIN'))){
+            return response()->json([
+                'success' => true
+            ], 200)->withCookie(new Cookie(env('JWT_COOKIE_LOGIN'), $request->cookie(env('JWT_COOKIE_LOGIN')), 0));
+        }
+    }
 }
