@@ -24,42 +24,42 @@ class JWTAuth
     {
         $token = null;
 
-        /**
-         * Get token from cookies
-        */
+        try {
+            /**
+            * Get token from cookies
+            */
             $tokenArr = [];
 
-        // Payload
-            if($request->cookie(env('JWT_COOKIE_PAYLOAD'))) $tokenArr[] = Crypt::decrypt($request->cookie(env('JWT_COOKIE_PAYLOAD')));
+            // Payload
+                if($request->cookie(env('JWT_COOKIE_PAYLOAD'))) $tokenArr[] = Crypt::decrypt($request->cookie(env('JWT_COOKIE_PAYLOAD')));
 
-        // Signature
-            if($request->cookie(env('JWT_COOKIE_SIG'))) $tokenArr[] = Crypt::decrypt($request->cookie(env('JWT_COOKIE_SIG')));
+            // Signature
+                if($request->cookie(env('JWT_COOKIE_SIG'))) $tokenArr[] = Crypt::decrypt($request->cookie(env('JWT_COOKIE_SIG')));
 
-        // Make JWT token
-            if(count($tokenArr) > 0) $token = implode('.', $tokenArr);
+            // Make JWT token
+                if(count($tokenArr) > 0) $token = implode('.', $tokenArr);
 
-        /**
-         * Get the token from Bearer as it is the only valid way to send the token
-         */
-        // if($request->header('Authorization')){
-        //     $tmpArr = explode(' ',$request->header('Authorization'));
-        //     if(end($tmpArr)) $token = end($tmpArr);
-        // }
+            /**
+             * Get the token from Bearer as it is the only valid way to send the token
+             */
+            // if($request->header('Authorization')){
+            //     $tmpArr = explode(' ',$request->header('Authorization'));
+            //     if(end($tmpArr)) $token = end($tmpArr);
+            // }
 
-        // Store the current authorized user token
-        if($request->cookie(env('JWT_COOKIE_LOGIN'))){
-            $loginAuth = Crypt::decrypt($request->cookie(env('JWT_COOKIE_LOGIN')));
-            if($loginAuth) $request->unsplashUser = $loginAuth;
-        }
+            // Store the current authorized user token
+            if($request->cookie(env('JWT_COOKIE_LOGIN')) && !is_array($request->cookie(env('JWT_COOKIE_LOGIN')))){
+                $loginAuth = Crypt::decrypt($request->cookie(env('JWT_COOKIE_LOGIN')));
+                if($loginAuth) $request->unsplashUser = $loginAuth;
+            }
 
-        if(!$token) {
-            // Unauthorized response if token not there
-            return response()->json([
-                'error' => 'Token not provided.'
-            ], 401);
-        }
+            if(!$token) {
+                // Unauthorized response if token not there
+                return response()->json([
+                    'error' => 'Token not provided.'
+                ], 401);
+            }
 
-        try {
             $credentials = JWT::decode($token, env('JWT_SECRET'), [env('JWT_ALGO', 'HS256')]);
 
             //Check the issuer is valid or not
