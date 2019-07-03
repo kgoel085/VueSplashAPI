@@ -100,7 +100,7 @@ class CORS
         // Overwriting default values
         
         // change origin settings
-        $this->settings['origin'] = env('APP_ORIGIN', '*');
+        $this->settings['origin'] = env('APP_ORIGIN', 'http://localhost');
 
         if ($request->isMethod('OPTIONS')) {
             $response = new Response("", 200);
