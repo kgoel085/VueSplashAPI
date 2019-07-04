@@ -9,7 +9,7 @@ use App\RequestLog;
 class CORS
 {
     protected $settings = array(
-        'origin' => '*',    // Wide Open!
+        'origin' => 'http://localhost:8080',    // Wide Open!
         'allowMethods' => 'GET,POST,OPTIONS',
         'allowCredentials' => true
     );
@@ -97,10 +97,6 @@ class CORS
      * @return mixed
      */
     public function handle($request, Closure $next) {
-        // Overwriting default values
-        
-        // change origin settings
-        $this->settings['origin'] = env('APP_ORIGIN', 'http://localhost');
 
         if ($request->isMethod('OPTIONS')) {
             $response = new Response("", 200);
