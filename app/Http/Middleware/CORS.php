@@ -9,10 +9,14 @@ use App\RequestLog;
 class CORS
 {
     protected $settings = array(
-        'origin' => 'http://localhost:8080',    // Wide Open!
+        'origin' => 'http://localhost:8080',
         'allowMethods' => 'GET,POST,OPTIONS',
         'allowCredentials' => true
     );
+
+    public function __construct(){
+        $this->settings['origin'] = env('APP_ORIGIN');
+    }
 
     protected function setOrigin($req, $rsp) {
         $origin = $this->settings['origin'];
