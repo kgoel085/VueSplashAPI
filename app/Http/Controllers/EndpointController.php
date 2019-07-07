@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Promise;
 use GuzzleHttp\Exception\ClientException;
 use Symfony\Component\HttpFoundation\Cookie;
+use Psr\Http\Message\ResponseInterface;
 
 class EndpointController extends Controller
 {
@@ -74,7 +76,7 @@ class EndpointController extends Controller
         return $this->performRequest($endPoint, $queryArr);
     }
 
-    //Returns details for the required collection id
+    //Returns details for the required user/collection/photos
     public function getSearch(Request $request, $id = 0, $action = null){
         $queryArr = array();
         $this->currentEndpoint = '/search';
@@ -89,6 +91,25 @@ class EndpointController extends Controller
         if(empty($endPoint) == false && empty($action == false)) $queryArr['query'] = $action;
 
         return $this->performRequest($endPoint, $queryArr);
+    }
+
+    public function fetchSearch(Request $request){
+        $queryArr = $endPointArr = array();
+        $this->currentEndpoint = '/search';
+
+        // Get all the request params
+        foreach($request->all() as $reqKeys => $reqVars){
+            if(in_array($reqKeys, $this->validParams) && $reqVars){
+                $queryArr[$reqKeys] = $reqVars;
+            }
+        }
+
+        // Endpoints to hit
+        $endPointArr['photos'] = "/search/photos";
+        $endPointArr['collections'] = "/search/collections";
+        $endPointArr['users'] = "/search/users";
+
+        return $this->performMultiRequest($endPointArr, $queryArr);
     }
 
     //Extract HTTP headers and return the required values
@@ -141,6 +162,74 @@ class EndpointController extends Controller
         }
 
         return $returnArr;
+    }
+
+    private function performMultiRequest($endpoint = array(), $queryArr = array()){
+        try{
+            //Prepare cURL client with configuration
+            $client = new Client([
+                'base_uri' => "https://api.unsplash.com"
+            ]);
+
+            // Send a request
+            $headersArr = array(
+                'Referer' => env('APP_URL'),
+                'Accept-Version' => 'v1',
+                'Authorization' => 'Client-ID '.env('CLIENT_ACCESS_KEY')
+            );
+
+            // Attach unsplash auth token, if present
+            if($this->authHeader) $headersArr['Authorization'] = 'Bearer '.$this->authHeader;
+            
+            $promises = array();
+            foreach($endpoint as $key =>$url) $promises[$key] = $client->getAsync($url, ['query' => $queryArr, 'headers' => $headersArr]);
+            
+            
+            // Wait on all of the requests to complete. Throws a ConnectException
+            // if any of the requests fail
+            
+            $results = Promise\unwrap($promises);
+
+            // Wait for the requests to complete, even if some of them fail
+            $results = Promise\settle($promises)->wait();
+
+            $returnArr = array();
+
+            foreach($results as $key => $result){
+                $tmpArr = array();
+                $responseBody = $headersArr = false;
+
+                //Get request response
+                $responseBody = json_decode($result['value']->getBody()->getContents(), true);
+                if($responseBody) $tmpArr['data'] = $responseBody;
+
+                if(count($tmpArr) > 0 && array_key_exists('data', $tmpArr)) $returnArr[$key] = $tmpArr;
+            }
+
+            if(count($returnArr) > 0){
+                return response()->json([
+                    'success' => $returnArr
+                ], 200);
+            }
+        }catch(ClientException $e){
+            $error = [
+                'status' => 400,
+                'message' => 'Error Ocurred !'
+            ];
+            $response = $e->getResponse();
+            $responseBodyAsString = $response->getBody()->getContents();
+
+            if(empty($responseBodyAsString) == false){
+                $tmpStr = json_decode($responseBodyAsString, true);
+                if($tmpStr && array_key_exists('error', $tmpStr) && count($tmpStr['error']) > 0){
+                    $error['message'] = implode(','.PHP_EOL, array_unique($tmpStr));
+                }
+            }
+            
+            return response()->json([
+                'error' => $error['message']
+            ], $error['status']);
+        }
     }
 
     private function performRequest($endpoint = '', $sendParams = array()){
