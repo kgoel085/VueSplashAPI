@@ -104,10 +104,15 @@ class EndpointController extends Controller
             }
         }
 
-        // Endpoints to hit
+        // Endpoints to hit && also check if extra params are passed for endpoint
         $endPointArr['photos'] = "/search/photos";
+        if($request->photos) $queryArr['photos'] = json_decode($request->photos, true);
+
         $endPointArr['collections'] = "/search/collections";
+        if($request->collections) $queryArr['collections'] = json_decode($request->collections, true);
+
         $endPointArr['users'] = "/search/users";
+        if($request->users) $queryArr['users'] = json_decode($request->users, true);
 
         return $this->performMultiRequest($endPointArr, $queryArr);
     }
@@ -182,7 +187,17 @@ class EndpointController extends Controller
             if($this->authHeader) $headersArr['Authorization'] = 'Bearer '.$this->authHeader;
             
             $promises = array();
-            foreach($endpoint as $key =>$url) $promises[$key] = $client->getAsync($url, ['query' => $queryArr, 'headers' => $headersArr]);
+            foreach($endpoint as $key =>$url){
+                $tmpQuery = $queryArr;
+
+                // Check if extra params for same endpoint was provided or not
+                if(array_key_exists($key, $tmpQuery)){
+                    $tmpQuery = $queryArr[$key];
+                    if(array_key_exists('total_pages', $tmpQuery)) unset($tmpQuery['total_pages']);
+                    if(array_key_exists('query', $queryArr)) $tmpQuery['query'] = $queryArr['query'];
+                }
+                $promises[$key] = $client->getAsync($url, ['query' => $tmpQuery, 'headers' => $headersArr]);
+            }
             
             
             // Wait on all of the requests to complete. Throws a ConnectException
