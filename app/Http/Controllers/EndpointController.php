@@ -117,6 +117,21 @@ class EndpointController extends Controller
         return $this->performMultiRequest($endPointArr, $queryArr);
     }
 
+    public function fetchUserDetails(Request $request, $username = false){
+        $this->currentEndpoint = "/users/$username";
+
+        $endpointArr = [
+            'user' => $this->currentEndpoint.'/',
+            'portfolio' => $this->currentEndpoint.'/portfolio',
+            'photos' => $this->currentEndpoint.'/photos',
+            'collections' => $this->currentEndpoint.'/collections',
+            'likes' => $this->currentEndpoint.'/likes',
+            'statistics' => $this->currentEndpoint.'/statistics',
+        ];
+
+        return $this->performMultiRequest($endpointArr);
+    }
+
     //Extract HTTP headers and return the required values
     private function getHeaderResponse($httpResponse = false){
         $returnArr = array();
@@ -236,8 +251,8 @@ class EndpointController extends Controller
 
             if(empty($responseBodyAsString) == false){
                 $tmpStr = json_decode($responseBodyAsString, true);
-                if($tmpStr && array_key_exists('error', $tmpStr) && count($tmpStr['error']) > 0){
-                    $error['message'] = implode(','.PHP_EOL, array_unique($tmpStr));
+                if($tmpStr && array_key_exists('errors', $tmpStr) && count($tmpStr['errors']) > 0){
+                    $error['message'] = implode(','.PHP_EOL, array_unique($tmpStr['errors']));
                 }
             }
             
@@ -299,8 +314,8 @@ class EndpointController extends Controller
 
             if(empty($responseBodyAsString) == false){
                 $tmpStr = json_decode($responseBodyAsString, true);
-                if($tmpStr && array_key_exists('error', $tmpStr) && count($tmpStr['error']) > 0){
-                    $error['message'] = implode(','.PHP_EOL, array_unique($tmpStr));
+                if($tmpStr && array_key_exists('errors', $tmpStr) && count($tmpStr['errors']) > 0){
+                    $error['message'] = implode(','.PHP_EOL, array_unique($tmpStr['errors']));
                 }
             }
             
