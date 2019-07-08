@@ -48,7 +48,7 @@ class LoginController extends BaseController
                         'success' => true
                     ], 200);
 
-                    $expiryTime = time() + (env('JWT_EXPIRY') * 100);
+                    $expiryTime = time() + (env('JWT_EXPIRY') * 60);
                     $encryptSignature = Crypt::encrypt($responseBody['access_token']);
                     if($encryptSignature){
                         $response = $response->withCookie(new Cookie(env('JWT_COOKIE_LOGIN'), $encryptSignature, $expiryTime, null, null, false, false));

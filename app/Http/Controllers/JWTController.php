@@ -33,7 +33,7 @@ class JWTController extends Controller
         $this->validateUser();
 
         // Expiry time for token
-        $this->expiryTime = time() + (env('JWT_EXPIRY') * 10);
+        $this->expiryTime = time() + (env('JWT_EXPIRY') * 60);
     }
 
     /**
