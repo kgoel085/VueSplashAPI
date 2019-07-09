@@ -49,6 +49,13 @@ class EndpointController extends Controller
     //Returns details for the required image id
     public function getUser(Request $request, $username = 0, $action = null){
         $this->currentEndpoint = '/users';
+        $queryArr = array();
+
+        foreach($request->all() as $reqKeys => $reqVars){
+            if(in_array($reqKeys, $this->validParams) && $reqVars){
+                $queryArr[$reqKeys] = $reqVars;
+            }
+        }
 
         $endPoint = (empty($username) == false) ? $this->currentEndpoint.'/'.$username : $this->currentEndpoint;
         if(empty($endPoint) == false && empty($action == false)) $endPoint  = $endPoint."/".$action;
@@ -56,7 +63,7 @@ class EndpointController extends Controller
         // Change endpoint, if private date is requested
         if($username == 'init' && $action == 'me') $endPoint = '/me';
 
-        return $this->performRequest($endPoint);
+        return $this->performRequest($endPoint, $queryArr);
     }
     
     //Returns details for the required collection id
