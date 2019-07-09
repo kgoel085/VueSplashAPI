@@ -122,7 +122,7 @@ class EndpointController extends Controller
 
         $endpointArr = [
             'user' => $this->currentEndpoint.'/',
-            'portfolio' => $this->currentEndpoint.'/portfolio',
+            //'portfolio' => $this->currentEndpoint.'/portfolio',
             'photos' => $this->currentEndpoint.'/photos',
             'collections' => $this->currentEndpoint.'/collections',
             'likes' => $this->currentEndpoint.'/likes',
